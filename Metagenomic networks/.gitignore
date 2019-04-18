@@ -1,0 +1,16 @@
+/target/
+/runtime
+
+.classpath
+.settings/
+.project
+
+.Rproj.user
+*.Rproj
+*.RData
+
+M0.vs.M1.pdf
+
+/dependency-reduced-pom.xml
+
+*.jar
