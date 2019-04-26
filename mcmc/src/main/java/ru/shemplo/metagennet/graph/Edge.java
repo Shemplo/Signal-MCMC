@@ -14,10 +14,14 @@ public class Edge extends Pair <Vertex, Vertex> {
     
     public double getWeight (int iteration, int total) {
         return iteration < total / 3
-             ? Math.pow (weight, -16)
-             : iteration < total * 2 / 3
-             ? Math.pow (weight, -8)
-             : weight;
+                ? Math.pow (weight, -4)
+                : iteration < total * 2 / 3
+                ? Math.pow (weight, -2)
+                : weight;
+           /*
+           double i = total == 0 ? 2.5 : (int) (iteration * 3 / total);
+           return Math.pow (weight, (i - 2) * 2);
+           */
     }
     
     public Edge (Vertex F, Vertex S, double weight) { 

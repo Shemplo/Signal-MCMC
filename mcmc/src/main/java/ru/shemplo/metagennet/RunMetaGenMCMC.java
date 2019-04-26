@@ -24,13 +24,13 @@ public class RunMetaGenMCMC {
     public static final Random RANDOM = new Random ();
     
     private static final boolean SIGNALS = true, LONG_RUN = false;
-    private static final int TRIES = 50, ITERATIONS = 300000;
+    private static final int TRIES = 50, ITERATIONS = 500000;
     private static final int MODULE_SIZE = 100;
     
     private static final BiFunction <GraphDescriptor, Integer, MCMC> SUPPLIER = 
         (graph, iterations) -> new MCMCConstant (graph, iterations);
     
-    private static final ExecutorService pool = Executors.newFixedThreadPool (3);
+    private static final ExecutorService pool = Executors.newFixedThreadPool (7);
     private static final Map <Vertex, Double> occurrences = new HashMap <> ();
     private static final CommonWriter writer = new CommonWriter ();
     
@@ -44,7 +44,6 @@ public class RunMetaGenMCMC {
         initial.getVertices ().stream ()
         . filter  (Objects::nonNull)
         . forEach (vertex -> occurrences.put (vertex, 0D));
-        System.out.println (initial.getVertices ().size () + " " + occurrences.size ());
         
         /*
         List <Double> aaa = initial.getEdgesList ().stream ()
@@ -89,7 +88,7 @@ public class RunMetaGenMCMC {
                 try {
                     long start = System.currentTimeMillis ();
                     MCMC singleRun = SUPPLIER.apply (descriptor, ITERATIONS);
-                    singleRun.doAllIterations (false);
+                    singleRun.doAllIterations (true);
                     
                     long end = System.currentTimeMillis ();
                     System.out.println (String.format ("Run finished in `%s` (time: %.3fs, starts: %d, commits: %d)", 

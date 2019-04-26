@@ -33,10 +33,14 @@ public class Vertex {
     
     public double getWeight (int iteration, int total) {
         return iteration < total / 3
-             ? Math.pow (weight, -16)
+             ? Math.pow (weight, -4)
              : iteration < total * 2 / 3
-             ? Math.pow (weight, -8)
+             ? Math.pow (weight, -2)
              : weight;
+        /*
+        double i = total == 0 ? 2.5 : (int) (iteration * 3 / total);
+        return Math.pow (weight, (i - 2) * 2);
+        */
     }
     
     public void addEdge (Edge edge) {

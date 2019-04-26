@@ -34,6 +34,7 @@ public class GraphDescriptor implements Cloneable {
     public GraphDescriptor setTausFromGraph (int vn, int en) {
         tauV = graph.getNthVertexWeight (vn);
         tauE = graph.getNthEdgeWeight (en);
+        System.out.println (tauV + " " + tauE);
         return this;
     }
     

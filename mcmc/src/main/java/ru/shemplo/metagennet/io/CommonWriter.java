@@ -16,14 +16,20 @@ public class CommonWriter {
         try (
             PrintWriter pw = new PrintWriter (filepath);
         ) {
-            pw.println ("gene\tpval\tsignal\t" + parameter);
+            pw.println ("gene\tdegree\tpval\tsignal\t" + parameter);
             occurrences.entrySet ().stream ()
             . map     (Pair::fromMapEntry)
             . sorted  ((a, b) -> -Double.compare (a.S, b.S))
             . forEach (p -> {
                 int signal = graph.getSignals ().getSignal (p.F).getId ();
-                pw.println (String.format ("%9s\t%.12f\t%6d\t%.6f", 
-                   p.F.getName (), p.F.getWeight (), signal, p.S));
+                int degree = p.F.getEdgesList ().size ();
+                
+                String name = p.F.getName ();
+                String weight = p.F.getWeight () < 1e-7
+                              ? String.format ("%.6e", p.F.getWeight ())
+                              : String.format ("%.10f", p.F.getWeight ());
+                pw.println (String.format ("%9s\t%4d\t%s\t%6d\t%.6f", 
+                            name, degree, weight, signal, p.S));
             });
         } catch (IOException ioe) {
             ioe.printStackTrace ();
@@ -35,7 +41,7 @@ public class CommonWriter {
         try (
             PrintWriter pw = new PrintWriter (filepath);
         ) {
-            pw.println ("gene\tpval\tsignal\t" + parameter);
+            pw.println ("gene\tdegree\tpval\tsignal\t" + parameter);
             
             GraphSignals gsignals = graph.getSignals ();
             Map <Integer, List <Vertex>> signals = occurrences.entrySet ().stream ()
@@ -51,6 +57,15 @@ public class CommonWriter {
                 pair.S.forEach (vertex -> {
                     pw.println (String.format ("%9s\t%.12f\t%6d\t%.6f", vertex.getName (), 
                                   vertex.getWeight (), pair.F, occurrences.get (vertex)));
+                    double occurences = occurrences.get (vertex);
+                    int degree = vertex.getEdgesList ().size ();
+                    
+                    String name = vertex.getName ();
+                    String weight = vertex.getWeight () < 1e-7
+                                  ? String.format ("%.6e", vertex.getWeight ())
+                                  : String.format ("%.10f", vertex.getWeight ());
+                    pw.println (String.format ("%9s\t%4d\t%s\t%6d\t%.6f", 
+                                name, degree, weight, pair.F, occurences));
                 });
             });
         } catch (IOException ioe) {
