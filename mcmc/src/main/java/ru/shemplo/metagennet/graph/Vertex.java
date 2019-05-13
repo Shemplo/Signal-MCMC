@@ -32,11 +32,13 @@ public class Vertex {
     @NonNull private Double weight;
     
     public double getWeight (int iteration, int total) {
+        return weight;
+        /*
         return iteration < total / 3
              ? Math.pow (weight, -4)
              : iteration < total * 2 / 3
              ? Math.pow (weight, -2)
-             : weight;
+             : weight;*/
         /*
         double i = total == 0 ? 2.5 : (int) (iteration * 3 / total);
         return Math.pow (weight, (i - 2) * 2);

@@ -15,13 +15,18 @@ import ru.shemplo.snowball.stuctures.Pair;
 import ru.shemplo.snowball.utils.StringManip;
 import ru.shemplo.snowball.utils.fp.StreamUtils;
 
-public class MelanomaGraphReader implements GraphReader {
-
+public class MelanomaAdvGraphReader extends MelanomaGraphReader {
+    
     @Override
     public Graph readGraph (String filename) throws IOException {
-        Map <String, Double> genesDesc = readGenes ("runtime/" + filename, 1);
+        Map <String, Double> genesDesc = super.readGenes ("runtime/melanoma", 1);
+        genesDesc.keySet ().forEach (gene -> {
+            genesDesc.compute (gene, (__, ___) -> 1D);
+        });
+        genesDesc.putAll (readGenes ("runtime/" + filename, 1)); // will override existing
+        
         List <Pair <String, String>> edgesDesc = readEdges ();
-        Graph graph = new Graph (0.668, 1.0);
+        Graph graph = new Graph (0.99, 1.0);
         
         edgesDesc = edgesDesc.stream ()
                   . filter  (pair -> genesDesc.containsKey (pair.F)
@@ -69,22 +74,7 @@ public class MelanomaGraphReader implements GraphReader {
         return graph;
     }
     
-    protected List <Pair <String, String>> readEdges () throws IOException {
-        List <Pair <String, String>> edges = new ArrayList <> ();
-        Path filepath = Paths.get ("runtime/inwebIM_ppi.txt");
-        try (
-            BufferedReader br = Files.newBufferedReader (filepath);
-        ) {
-            String line = null;
-            while ((line = StringManip.fetchNonEmptyLine (br)) != null) {
-                final StringTokenizer st = new StringTokenizer (line);
-                edges.add (Pair.mp (st.nextToken (), st.nextToken ()));
-            }
-        }
-        
-        return edges;
-    }
-    
+    @Override
     protected Map <String, Double> readGenes (String filename, int shift) throws IOException {
         final Map <String, Double> genes = new HashMap <> ();
         Path filepath = Paths.get (filename);
@@ -93,15 +83,30 @@ public class MelanomaGraphReader implements GraphReader {
         ) {
             br.readLine (); // titles
             
+            Map <String, Set <String>> classes = new HashMap <> ();
+            Map <String, Double> pvals = new HashMap <> ();
+            
             String line = null;
             while ((line = StringManip.fetchNonEmptyLine (br)) != null) {
                 final StringTokenizer st = new StringTokenizer (line);
                 List <String> tokens = StreamUtils.whilst (StringTokenizer::hasMoreTokens, 
                                                            StringTokenizer::nextToken, st)
                                      . collect (Collectors.toList ());
-                Double pvalue = Double.parseDouble (tokens.get (1 + shift));
-                genes.put (tokens.get (shift), pvalue);
+                
+                final String eqClass = tokens.get (4);
+                classes.putIfAbsent (eqClass, new LinkedHashSet <> ());
+                
+                final String [] genesArray = tokens.get (6).split (";");
+                classes.get (eqClass).addAll (Arrays.asList (genesArray));
+                
+                final double pvalue = Double.parseDouble (tokens.get (3));
+                pvals.compute (eqClass, (__, v) -> v == null ? pvalue : Math.min (v, pvalue));
             }
+            
+            classes.forEach ((eq, genesSet) -> {
+                final double pvalue = pvals.get (eq);
+                genesSet.forEach (gene -> genes.put (gene, pvalue));
+            });
         }
         
         return genes;

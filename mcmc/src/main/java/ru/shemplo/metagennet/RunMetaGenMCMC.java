@@ -13,8 +13,8 @@ import ru.shemplo.metagennet.graph.Graph;
 import ru.shemplo.metagennet.graph.GraphDescriptor;
 import ru.shemplo.metagennet.graph.Vertex;
 import ru.shemplo.metagennet.io.CommonWriter;
-import ru.shemplo.metagennet.io.GWASGraphReader;
 import ru.shemplo.metagennet.io.GraphReader;
+import ru.shemplo.metagennet.io.MelanomaAdvGraphReader;
 import ru.shemplo.metagennet.mcmc.MCMC;
 import ru.shemplo.metagennet.mcmc.MCMCConstant;
 import ru.shemplo.snowball.stuctures.Pair;
@@ -24,8 +24,8 @@ public class RunMetaGenMCMC {
     public static final Random RANDOM = new Random ();
     
     private static final boolean SIGNALS = true, LONG_RUN = false;
-    private static final int TRIES = 50, ITERATIONS = 500000;
-    private static final int MODULE_SIZE = 100;
+    private static final int TRIES = 40, ITERATIONS = 400000;
+    private static final int MODULE_SIZE = 75;
     
     private static final BiFunction <GraphDescriptor, Integer, MCMC> SUPPLIER = 
         (graph, iterations) -> new MCMCConstant (graph, iterations);
@@ -37,8 +37,9 @@ public class RunMetaGenMCMC {
     public static void main (String ... args) throws IOException, InterruptedException {
         Locale.setDefault (Locale.ENGLISH);
         
-        GraphReader reader = new GWASGraphReader ();
-        Graph initial = reader.readGraph ("paper_");
+        GraphReader reader = new MelanomaAdvGraphReader ();
+        Graph initial = reader.readGraph ("mapped_melanoma_gwas.txt");
+        //Graph initial = reader.readGraph ("paper_");
         System.out.println ("Graph loaded");
         
         initial.getVertices ().stream ()
@@ -88,7 +89,7 @@ public class RunMetaGenMCMC {
                 try {
                     long start = System.currentTimeMillis ();
                     MCMC singleRun = SUPPLIER.apply (descriptor, ITERATIONS);
-                    singleRun.doAllIterations (true);
+                    singleRun.doAllIterations (false);
                     
                     long end = System.currentTimeMillis ();
                     System.out.println (String.format ("Run finished in `%s` (time: %.3fs, starts: %d, commits: %d)", 

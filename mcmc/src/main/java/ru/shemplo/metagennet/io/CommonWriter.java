@@ -55,8 +55,6 @@ public class CommonWriter {
             . forEach (pair -> {
                 pair.S.sort ((a, b) -> -Double.compare (occurrences.get (a), occurrences.get (b)));
                 pair.S.forEach (vertex -> {
-                    pw.println (String.format ("%9s\t%.12f\t%6d\t%.6f", vertex.getName (), 
-                                  vertex.getWeight (), pair.F, occurrences.get (vertex)));
                     double occurences = occurrences.get (vertex);
                     int degree = vertex.getEdgesList ().size ();
                     
