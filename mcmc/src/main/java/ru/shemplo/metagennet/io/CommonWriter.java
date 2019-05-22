@@ -11,6 +11,19 @@ import ru.shemplo.snowball.stuctures.Pair;
 
 public class CommonWriter {
     
+    public void saveLikelihoods (String filepath, List <Double> likelihoods) {
+        try (
+            PrintWriter pw = new PrintWriter (filepath);
+        ) {
+            pw.println ("iteration\tlikelihood");
+            for (int i = 0; i < likelihoods.size (); i++) {
+                pw.println (String.format ("%d\t%e", i, likelihoods.get (i)));
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace ();
+        }
+    }
+    
     public void saveMap (String filepath, String parameter, 
             Map <Vertex, Double> occurrences, Graph graph) {
         try (

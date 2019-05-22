@@ -17,7 +17,7 @@ public class MCMCJoinOrLeave extends AbsMCMC {
         
         //long start = System.currentTimeMillis ();
         if (iteration == 0) {
-            currentGraph = initialGraph.setTausFromGraph (50, 50);                
+            currentGraph = initialGraph.setTausFromGraph (TAU_V_N, TAU_E_N);
             if (idling) { // initial state for next MCMC
                 currentGraph.setTauV (1.0);
                 currentGraph.setTauE (1.0);

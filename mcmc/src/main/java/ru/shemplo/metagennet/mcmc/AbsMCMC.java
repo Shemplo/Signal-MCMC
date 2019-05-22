@@ -25,13 +25,16 @@ public abstract class AbsMCMC implements MCMC {
     @Getter
     protected final List <Set <Vertex>> snapshots = new ArrayList <> ();
     
+    @Getter 
+    protected final List <Double> likelihoods = new ArrayList <> ();
+    
     @Override
     public boolean finishedWork () {
         return iteration >= iterations;
     }
     
     @Override
-    public void doAllIterations (boolean idling) {
+    public void doAllIterations (boolean idling, boolean trace) {
         if (!idling) {
             //System.out.println (initialGraph.toVerticesString ());
             //System.out.println (initialGraph.getEdges ());
@@ -69,6 +72,8 @@ public abstract class AbsMCMC implements MCMC {
                 //System.out.println (currentGraph);
             }
             //System.out.println (currentGraph.getEdges ());
+            
+            if (trace) { likelihoods.add (currentGraph.getLogLikelihood ()); }
         }
         
         if (!idling) {

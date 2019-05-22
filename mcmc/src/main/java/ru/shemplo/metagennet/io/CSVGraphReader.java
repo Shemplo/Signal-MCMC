@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import ru.shemplo.metagennet.graph.Edge;
 import ru.shemplo.metagennet.graph.Graph;
+import ru.shemplo.metagennet.graph.GraphSignals;
 import ru.shemplo.metagennet.graph.Vertex;
 import ru.shemplo.snowball.stuctures.Pair;
 import ru.shemplo.snowball.utils.StringManip;
@@ -62,6 +63,8 @@ public class CSVGraphReader implements GraphReader {
             Edge edgeI = new Edge (vertices.get (from), vertices.get (to), weight);
             graph.addEdge (edgeI);
         });
+        
+        graph.setSignals (GraphSignals.assignUnique (graph));
         
         if (filenamePrefix.equals ("paper_")) {
             graph.getOrientier ().addAll (Arrays.asList (

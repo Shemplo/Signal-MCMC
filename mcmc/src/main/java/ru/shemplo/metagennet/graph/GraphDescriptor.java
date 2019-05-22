@@ -26,15 +26,22 @@ public class GraphDescriptor implements Cloneable {
     @Getter private final Map <GraphSignal, Set <Vertex>> modules = new HashMap <> ();
     @Getter private final Set <Vertex> vertices = new LinkedHashSet <> ();
     @Getter private final Set <Edge> edges  = new LinkedHashSet <> (),
-                                     bedges = new LinkedHashSet <> ();
+                                     bedges = new HashSet <> ();
     
     @Getter @Setter private double tauE = 1, tauV = 1;
     @Getter private double ratio = 1;
     
     public GraphDescriptor setTausFromGraph (int vn, int en) {
-        tauV = graph.getNthVertexWeight (vn);
-        tauE = graph.getNthEdgeWeight (en);
-        System.out.println (tauV + " " + tauE);
+        if (vn < 1 || en < 1) {
+            String message = "Tau selection parameters must be positive";
+            throw new IllegalArgumentException (message);
+        }
+        
+        tauV = graph.getNthVertexWeight (vn - 1);
+        tauE = graph.getNthEdgeWeight (en - 1);
+        
+        System.out.println (String.format ("Tau: v[%d]=%e, e[%d]=%e", 
+                                        vn - 1 ,tauV, en - 1, tauE));
         return this;
     }
     
@@ -75,7 +82,7 @@ public class GraphDescriptor implements Cloneable {
         StringJoiner sj = new StringJoiner ("\n");
         sj.add ("graph finite_state_machine {");
         sj.add ("    rankdir=LR;");
-        sj.add ("    size=\"64\";");
+        //sj.add ("    size=\"64\";");
         sj.add ("    node [shape = doublecircle];");
         sj.add ("    node [color = red];");
         for (Vertex vertex : vertices) {
@@ -102,6 +109,18 @@ public class GraphDescriptor implements Cloneable {
         sj.add ("}");
         
         return sj.toString ();
+    }
+    
+    public double getLogLikelihood () {
+        double likelihood = 1;
+        for (Vertex vertex : vertices) {
+            likelihood *= Math.pow (vertex.getWeight (), 0.125);
+        }
+        for (Edge edge : edges) {
+            likelihood *= Math.pow (edge.getWeight (), 0.125);
+        }
+        
+        return Math.log (likelihood);
     }
     
     public GraphDescriptor commit () {
@@ -152,11 +171,8 @@ public class GraphDescriptor implements Cloneable {
     private void applyAdd (Edge edge, int i, int total) {
         edges.add (edge);
         
-        if (!signal) {
-            final double w = edge.getWeight (i, total);
-            //ratio *= betaAE * Math.pow (w, betaAE - 1);
-            ratio *= Math.pow (w / tauE, betaAE - 1);
-        }
+        final double w = edge.getWeight (i, total);
+        ratio *= Math.pow (w / tauE, betaAE - 1);
         
         applyVertexAdd (edge.F, edge, i, total);
         applyVertexAdd (edge.S, edge, i, total);
@@ -172,16 +188,15 @@ public class GraphDescriptor implements Cloneable {
                 final double w = vertex.getWeight (i, total);
                 ratio *= Math.pow (w / tauV, betaAV - 1);
             } else {
-                GraphSignal module = graph.getSignals ().getSignal (vertex);
-                if (!modules.containsKey (module)) {
-                    modules.put (module, new HashSet <> ());
+                GraphSignal signal = graph.getSignals ().getSignal (vertex);
+                if (!modules.containsKey (signal)) {
+                    modules.put (signal, new HashSet <> ());
                     
                     final double w = vertex.getWeight (i, total);
-                    //ratio *= betaAV * Math.pow (w, betaAV - 1);
                     ratio *= Math.pow (w / tauV, betaAV - 1);
                 }
                 
-                modules.get (module).add (vertex);
+                modules.get (signal).add (vertex);
             }
         }
     }
@@ -204,11 +219,8 @@ public class GraphDescriptor implements Cloneable {
         edges.remove (edge);
         bedges.add (edge);
         
-        if (!signal) {
-            final double w = edge.S.getWeight (i, total);            
-            //ratio /= betaAE * Math.pow (w, betaAE - 1);
-            ratio /= Math.pow (w / tauE, betaAE - 1);
-        }
+        final double w = edge.getWeight (i, total);
+        ratio /= Math.pow (w / tauE, betaAE - 1);
         
         applyVertex (edge.F, edge, 1, i, total);
         applyVertex (edge.S, edge, 1, i, total);
@@ -240,7 +252,6 @@ public class GraphDescriptor implements Cloneable {
             
             if (!signal) {
                 final double w = vertex.getWeight (i, total);
-                //ratio /= betaAV * Math.pow (w, betaAV - 1);
                 ratio /= Math.pow (w / tauV, betaAV - 1);
             } else {
                 GraphSignal module = graph.getSignals ().getSignal (vertex);
@@ -250,8 +261,8 @@ public class GraphDescriptor implements Cloneable {
                 
                 if (set.isEmpty ()) {
                     final double w = vertex.getWeight (i, total);
-                    //ratio /= betaAV * Math.pow (w, betaAV - 1);
                     ratio /= Math.pow (w / tauV, betaAV - 1);
+                    modules.remove (module);
                 }
             }
         }

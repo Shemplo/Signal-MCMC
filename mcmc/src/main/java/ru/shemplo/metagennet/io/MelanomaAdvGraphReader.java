@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 
 import ru.shemplo.metagennet.graph.Graph;
 import ru.shemplo.metagennet.graph.GraphSignals;
+import ru.shemplo.metagennet.graph.GraphSignals.GraphSignal;
+import ru.shemplo.metagennet.graph.Vertex;
 import ru.shemplo.snowball.stuctures.Pair;
 import ru.shemplo.snowball.utils.StringManip;
 import ru.shemplo.snowball.utils.fp.StreamUtils;
@@ -21,12 +23,12 @@ public class MelanomaAdvGraphReader extends MelanomaGraphReader {
     public Graph readGraph (String filename) throws IOException {
         Map <String, Double> genesDesc = super.readGenes ("runtime/melanoma", 1);
         genesDesc.keySet ().forEach (gene -> {
-            genesDesc.compute (gene, (__, ___) -> 1D);
+            genesDesc.compute (gene, (__, ___) -> -1.0D);
         });
         genesDesc.putAll (readGenes ("runtime/" + filename, 1)); // will override existing
         
         List <Pair <String, String>> edgesDesc = readEdges ();
-        Graph graph = new Graph (0.99, 1.0);
+        Graph graph = new Graph (0.386, 1.0);
         
         edgesDesc = edgesDesc.stream ()
                   . filter  (pair -> genesDesc.containsKey (pair.F)
@@ -39,8 +41,10 @@ public class MelanomaAdvGraphReader extends MelanomaGraphReader {
         Map <String, Integer> gene2index = new HashMap <> ();
         for (int i = 0; i < genesVerts.size (); i++) {
             String name = genesVerts.get (i);
-            graph.addVertex (i, genesDesc.get (name))
-                 .setName (name);
+            Vertex v = graph.addVertex (i, genesDesc.get (name));
+            v.setStable (v.getWeight () != -1.0D); 
+            v.setName (name);
+            
             gene2index.put (name, i);
         }
         
@@ -55,13 +59,22 @@ public class MelanomaAdvGraphReader extends MelanomaGraphReader {
         }
         
         graph.setSignals (GraphSignals.splitGraph (graph));
-        /*
-        GraphModules modules = graph.getModules ();
-        modules.getModules ().forEach ((vert, module) -> {
-            System.out.println ("Module");
-            module.getVertices ().forEach (System.out::println);
+        ///*
+        GraphSignals modules = graph.getSignals ();
+        modules.getSignals ().values ().stream ().distinct ()
+        . filter  (signal -> signal.getVertices ().size () > 1)
+        . sorted  (Comparator.comparing (GraphSignal::getLikelihood))
+        . forEach (signal -> {
+            Set <Vertex> vertices = signal.getVertices ();
+            Vertex vertex = vertices.iterator ().next ();
+            System.out.print (String.format ("Signal |S = %-2d| {W = %.3e} ", vertices.size (), vertex.getWeight ()));
+            System.out.print (signal.getVertices ().stream ().limit (49).map (Vertex::getName)
+                              . collect (Collectors.joining (", ", "[", "")));
+            if (signal.getVertices ().size () < 50) {
+                System.out.println ("]");
+            } else { System.out.println (", ...]"); }
         });
-        */
+        //*/
         
         graph.getOrientier ().addAll (Arrays.asList (
             "CDKN2A", "MTAP", "MX2", "PARP1", "ARNT", "SETDB1",

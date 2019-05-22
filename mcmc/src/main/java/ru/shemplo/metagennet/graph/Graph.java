@@ -1,6 +1,7 @@
 package ru.shemplo.metagennet.graph;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import lombok.Getter;
@@ -108,6 +109,12 @@ public class Graph {
         return graph.commit ();
     }
     
+    public void regenerateVerticesWeight (Function <Vertex, Double> generator) {
+        vertices.forEach (vertex -> {
+            vertex.setWeight (generator.apply (vertex));
+        });
+    }
+    
     public Vertex addVertex (int id, Double weight) {
         return addVertex (new Vertex (id, weight));
     }
@@ -165,7 +172,7 @@ public class Graph {
         
         return edges.stream ()
              . map       (Edge::getWeight)
-             . sorted    ().skip (n)
+             . sorted    ().distinct ().skip (n)
              . findFirst ().get ();
     }
     
@@ -177,7 +184,7 @@ public class Graph {
         
         return vertices.stream ()
              . map       (Vertex::getWeight)
-             . sorted    ().skip (n)
+             . sorted    ().distinct ().skip (n)
              . findFirst ().get ();
     }
     

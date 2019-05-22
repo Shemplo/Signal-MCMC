@@ -17,7 +17,7 @@ public class Vertex {
     
     @Getter private final int id;
     
-    @Setter 
+    @Setter
     private String name;
     
     public String getName () {
@@ -30,6 +30,9 @@ public class Vertex {
     
     @Getter @Setter
     @NonNull private Double weight;
+    
+    @Getter @Setter
+    private boolean stable = true;
     
     public double getWeight (int iteration, int total) {
         return weight;

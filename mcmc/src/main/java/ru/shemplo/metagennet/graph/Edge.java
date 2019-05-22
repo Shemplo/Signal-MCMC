@@ -51,7 +51,7 @@ public class Edge extends Pair <Vertex, Vertex> {
      */
     @Override
     public int hashCode () {
-        return (F.getId () << 15) | S.getId ();
+        return (F.getId () << 16) | S.getId ();
     }
     
 }

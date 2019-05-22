@@ -11,35 +11,51 @@ import java.util.stream.Collectors;
 
 import ru.shemplo.metagennet.graph.Graph;
 import ru.shemplo.metagennet.graph.GraphDescriptor;
+import ru.shemplo.metagennet.graph.GraphSignals;
 import ru.shemplo.metagennet.graph.Vertex;
 import ru.shemplo.metagennet.io.CommonWriter;
 import ru.shemplo.metagennet.io.GraphReader;
 import ru.shemplo.metagennet.io.MelanomaAdvGraphReader;
 import ru.shemplo.metagennet.mcmc.MCMC;
-import ru.shemplo.metagennet.mcmc.MCMCConstant;
+import ru.shemplo.metagennet.mcmc.MCMCJoinOrLeave;
 import ru.shemplo.snowball.stuctures.Pair;
 
 public class RunMetaGenMCMC {
     
+    public static final int TAU_E_N = 1, TAU_V_N = 11;
+    
     public static final Random RANDOM = new Random ();
     
-    private static final boolean SIGNALS = true, LONG_RUN = false;
-    private static final int TRIES = 40, ITERATIONS = 400000;
-    private static final int MODULE_SIZE = 75;
+    private static final boolean SIGNALS = true, LONG_RUN = !true;
+    private static final int TRIES = 100, ITERATIONS = 250000;
+    private static final boolean REGENERATE = true;
+    private static final boolean TRACE = !true;
+    private static final int MODULE_SIZE = 1;
+    
     
     private static final BiFunction <GraphDescriptor, Integer, MCMC> SUPPLIER = 
-        (graph, iterations) -> new MCMCConstant (graph, iterations);
+        (graph, iterations) -> new MCMCJoinOrLeave (graph, iterations);
     
-    private static final ExecutorService pool = Executors.newFixedThreadPool (7);
+    private static final ExecutorService pool = Executors.newFixedThreadPool (REGENERATE ? 1 : 2);
     private static final Map <Vertex, Double> occurrences = new HashMap <> ();
+    private static final List <Double> likelihoods = new ArrayList <> ();
     private static final CommonWriter writer = new CommonWriter ();
     
     public static void main (String ... args) throws IOException, InterruptedException {
         Locale.setDefault (Locale.ENGLISH);
         
-        GraphReader reader = new MelanomaAdvGraphReader ();
+        final GraphReader reader      = new MelanomaAdvGraphReader ();
         Graph initial = reader.readGraph ("mapped_melanoma_gwas.txt");
+        
+        //final GraphReader reader = new CSVGraphReader ();
         //Graph initial = reader.readGraph ("paper_");
+        
+        //GraphReader reader = new GWASGraphReader ();
+        //Graph initial = reader.readGraph ("");
+        System.out.println ("Vertecies: " + initial.getVertices ().size ());
+        System.out.println ("Signals: " + initial.getSignals ()
+                            . getSignals ().values ().stream ()
+                            . distinct ().count ());
         System.out.println ("Graph loaded");
         
         initial.getVertices ().stream ()
@@ -63,17 +79,11 @@ public class RunMetaGenMCMC {
         ) {
             @SuppressWarnings ("unused")
             GraphDescriptor full = initial.getFullDescriptor (false);
+            System.out.println (initial.getFixedDescriptor (30, SIGNALS));
             //pw.println (full.toDot ());
         }
         
-        //GraphHolder mcmc = new GraphHolder (readMatrix (new File ("runtime/graph_good.csv")));
-        //List <List <Double>> graphMatrix = readMatrix (GraphGenerator.GEN_FILE);
-        //Graph initial = new Graph (graphMatrix, null);
-        
         for (int i = 0; i < TRIES; i++) {
-            GraphDescriptor descriptor = initial.getFixedDescriptor (MODULE_SIZE, SIGNALS);
-            System.out.println ("Initial descriptor:");
-            System.out.println (descriptor);
             /*
             descriptor.getVertices ().forEach (vertex -> {
                 vertex.getEdges ().keySet ().forEach (nei -> {
@@ -87,9 +97,22 @@ public class RunMetaGenMCMC {
             
             pool.execute (() -> {
                 try {
+                    if (REGENERATE) {
+                        initial.regenerateVerticesWeight (vertex -> {
+                            double weight = RANDOM.nextDouble () * RANDOM.nextDouble ();
+                            return vertex.isStable () ? vertex.getWeight () : weight;
+                        });
+                        
+                        initial.setSignals (GraphSignals.splitGraph (initial));
+                    }
+                    
+                    GraphDescriptor descriptor = initial.getFixedDescriptor (MODULE_SIZE, SIGNALS);
+                    System.out.println ("Initial descriptor:");
+                    System.out.println (descriptor);
+                    
                     long start = System.currentTimeMillis ();
                     MCMC singleRun = SUPPLIER.apply (descriptor, ITERATIONS);
-                    singleRun.doAllIterations (false);
+                    singleRun.doAllIterations (false, TRACE);
                     
                     long end = System.currentTimeMillis ();
                     System.out.println (String.format ("Run finished in `%s` (time: %.3fs, starts: %d, commits: %d)", 
@@ -124,6 +147,11 @@ public class RunMetaGenMCMC {
                         occurrences.compute (vertex, (___, v) -> v == null ? 1 : v + 1)
                     );
                 });
+            }
+            
+            if (singleRun.getLikelihoods ().size () > 0) {
+                likelihoods.clear (); // truncate previous result
+                likelihoods.addAll (singleRun.getLikelihoods ());
             }
             
             size = singleRun.getCurrentGraph ().getVertices ().size ();
@@ -174,6 +202,10 @@ public class RunMetaGenMCMC {
             
             GraphDescriptor finalD = graph.getFinalDescriptor (orientier.size (), occurrences);
             writer.saveGradientDOTFile ("runtime/final.dot", finalD, occurrences, Color.YELLOW, Color.GRAY);
+        }
+        
+        if (likelihoods.size () > 0) {
+            writer.saveLikelihoods ("runtime/likelihoods.csv", likelihoods);
         }
     }
     

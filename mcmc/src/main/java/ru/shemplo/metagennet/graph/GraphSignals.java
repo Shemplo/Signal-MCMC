@@ -10,8 +10,23 @@ import lombok.*;
 
 public class GraphSignals {
     
+    public static GraphSignals assignUnique (Graph graph) {
+        GraphSignals signals = new GraphSignals ();
+        
+        AtomicInteger counter = new AtomicInteger (1);
+        for (Vertex vertex : graph.getVertices ()) {
+            final Set <Vertex> set = new HashSet <> (Arrays.asList (vertex));
+            final double weight = vertex.getWeight ();
+            final int id = counter.getAndIncrement ();
+            
+            signals.addSignal (new GraphSignal (id, set, weight));
+        }
+        
+        return signals;
+    }
+    
     public static GraphSignals splitGraph (Graph graph) {
-        GraphSignals modules = new GraphSignals ();
+        GraphSignals signals = new GraphSignals ();
         Map <Double, List <Vertex>> mds = graph.getVertices ().stream ()
                                         . filter  (Objects::nonNull)
                                         . collect (groupingBy (Vertex::getWeight));
@@ -27,33 +42,33 @@ public class GraphSignals {
         mds.forEach ((weight, vertices) -> {
             if (weight <= threshold) {
                 final Set <Vertex> set = new HashSet <> (vertices);
-                modules.addSignal (new GraphSignal (iterator.getAndIncrement (),
+                signals.addSignal (new GraphSignal (iterator.getAndIncrement (),
                                                     set, weight));                
             } else {
                 for (Vertex vertex : vertices) {
                     Set <Vertex> set = new HashSet <> ();
                     set.add (vertex);
                     
-                    modules.addSignal (new GraphSignal (iterator.getAndIncrement (),
+                    signals.addSignal (new GraphSignal (iterator.getAndIncrement (),
                                                         set, weight));
                 }
             }
         });
         
-        return modules;
+        return signals;
     }
     
     @Getter
-    private final Map <Integer, GraphSignal> modules = new HashMap <> ();
+    private final Map <Integer, GraphSignal> signals = new HashMap <> ();
     
     public void addSignal (GraphSignal module) {
         module.vertices.forEach (vertex -> {
-            modules.put (vertex.getId (), module);
+            signals.put (vertex.getId (), module);
         });
     }
     
     public Double getRatio (Vertex vertex) {
-        return modules.get (vertex.getId ()).getLikelihood ();
+        return signals.get (vertex.getId ()).getLikelihood ();
     }
     
     public GraphSignal getSignal (Vertex vertex) {
@@ -63,7 +78,7 @@ public class GraphSignals {
     
     public GraphSignal getSignal (Integer vertexID) {
         if (vertexID == null) { return null; }
-        return modules.get (vertexID);
+        return signals.get (vertexID);
     }
     
     @ToString

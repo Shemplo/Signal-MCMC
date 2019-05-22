@@ -8,13 +8,15 @@ import ru.shemplo.metagennet.graph.Vertex;
 
 public interface MCMC {
     
-    public void doAllIterations (boolean idling);
+    public void doAllIterations (boolean idling, boolean trace);
     
     public boolean finishedWork ();
     
     public GraphDescriptor getCurrentGraph ();
     
     public List <Set <Vertex>> getSnapshots ();
+    
+    public List <Double> getLikelihoods ();
     
     public void makeIteration (boolean idling);
     
