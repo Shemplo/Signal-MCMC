@@ -1,12 +1,12 @@
-package ru.shemplo.metagennet.io;
+package ru.shemplo.mcmc.io;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import ru.shemplo.metagennet.graph.Graph;
-import ru.shemplo.metagennet.graph.GraphSignals;
+import ru.shemplo.mcmc.graph.Graph;
+import ru.shemplo.mcmc.graph.GraphSignals;
 import ru.shemplo.snowball.stuctures.Pair;
 
 public class GWASGraphReader extends MelanomaGraphReader {

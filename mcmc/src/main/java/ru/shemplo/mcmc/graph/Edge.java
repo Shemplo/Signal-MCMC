@@ -1,4 +1,4 @@
-package ru.shemplo.metagennet.graph;
+package ru.shemplo.mcmc.graph;
 
 import lombok.Getter;
 import lombok.NonNull;

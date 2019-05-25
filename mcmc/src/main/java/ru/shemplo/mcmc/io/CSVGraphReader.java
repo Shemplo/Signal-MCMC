@@ -1,4 +1,4 @@
-package ru.shemplo.metagennet.io;
+package ru.shemplo.mcmc.io;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import ru.shemplo.metagennet.graph.Edge;
-import ru.shemplo.metagennet.graph.Graph;
-import ru.shemplo.metagennet.graph.GraphSignals;
-import ru.shemplo.metagennet.graph.Vertex;
+import ru.shemplo.mcmc.graph.Edge;
+import ru.shemplo.mcmc.graph.Graph;
+import ru.shemplo.mcmc.graph.GraphSignals;
+import ru.shemplo.mcmc.graph.Vertex;
 import ru.shemplo.snowball.stuctures.Pair;
 import ru.shemplo.snowball.utils.StringManip;
 

@@ -1,4 +1,4 @@
-package ru.shemplo.metagennet;
+package ru.shemplo.mcmc;
 
 import java.awt.Color;
 import java.io.*;
@@ -9,25 +9,25 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import ru.shemplo.metagennet.graph.Graph;
-import ru.shemplo.metagennet.graph.GraphDescriptor;
-import ru.shemplo.metagennet.graph.GraphSignals;
-import ru.shemplo.metagennet.graph.Vertex;
-import ru.shemplo.metagennet.io.CommonWriter;
-import ru.shemplo.metagennet.io.GraphReader;
-import ru.shemplo.metagennet.io.MelanomaAdvGraphReader;
-import ru.shemplo.metagennet.mcmc.MCMC;
-import ru.shemplo.metagennet.mcmc.MCMCJoinOrLeave;
+import ru.shemplo.mcmc.graph.Graph;
+import ru.shemplo.mcmc.graph.GraphDescriptor;
+import ru.shemplo.mcmc.graph.GraphSignals;
+import ru.shemplo.mcmc.graph.Vertex;
+import ru.shemplo.mcmc.impl.MCMC;
+import ru.shemplo.mcmc.impl.MCMCJoinOrLeave;
+import ru.shemplo.mcmc.io.CommonWriter;
+import ru.shemplo.mcmc.io.GraphReader;
+import ru.shemplo.mcmc.io.MelanomaAdvGraphReader;
 import ru.shemplo.snowball.stuctures.Pair;
 
 public class RunMetaGenMCMC {
     
-    public static final int TAU_E_N = 1, TAU_V_N = 11;
+    public static final int TAU_E_N = 1, TAU_V_N = 10;
     
     public static final Random RANDOM = new Random ();
     
     private static final boolean SIGNALS = true, LONG_RUN = !true;
-    private static final int TRIES = 100, ITERATIONS = 250000;
+    private static final int TRIES = 1, ITERATIONS = 250000;
     private static final boolean REGENERATE = true;
     private static final boolean TRACE = !true;
     private static final int MODULE_SIZE = 1;

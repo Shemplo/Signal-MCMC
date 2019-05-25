@@ -1,4 +1,4 @@
-package ru.shemplo.metagennet.graph;
+package ru.shemplo.mcmc.graph;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import ru.shemplo.metagennet.graph.GraphSignals.GraphSignal;
+import ru.shemplo.mcmc.graph.GraphSignals.GraphSignal;
 import ru.shemplo.snowball.stuctures.Pair;
 import ru.shemplo.snowball.stuctures.Trio;
 
@@ -23,7 +23,7 @@ public class GraphDescriptor implements Cloneable {
     private final Deque <Trio <Integer, Edge, Double>> history 
           = new LinkedList <> ();
     
-    @Getter private final Map <GraphSignal, Set <Vertex>> modules = new HashMap <> ();
+    @Getter private final Map <GraphSignal, Set <Vertex>> signals = new HashMap <> ();
     @Getter private final Set <Vertex> vertices = new LinkedHashSet <> ();
     @Getter private final Set <Edge> edges  = new LinkedHashSet <> (),
                                      bedges = new HashSet <> ();
@@ -189,14 +189,17 @@ public class GraphDescriptor implements Cloneable {
                 ratio *= Math.pow (w / tauV, betaAV - 1);
             } else {
                 GraphSignal signal = graph.getSignals ().getSignal (vertex);
-                if (!modules.containsKey (signal)) {
-                    modules.put (signal, new HashSet <> ());
-                    
+                if (!signals.containsKey (signal)) {
+                    signals.put (signal, new HashSet <> ());
+                }
+                
+                final Set <Vertex> set = signals.get (signal);
+                if (set.isEmpty ()) {
                     final double w = vertex.getWeight (i, total);
                     ratio *= Math.pow (w / tauV, betaAV - 1);
                 }
                 
-                modules.get (signal).add (vertex);
+                set.add (vertex);
             }
         }
     }
@@ -255,14 +258,13 @@ public class GraphDescriptor implements Cloneable {
                 ratio /= Math.pow (w / tauV, betaAV - 1);
             } else {
                 GraphSignal module = graph.getSignals ().getSignal (vertex);
-                Set <Vertex> set = modules.get (module);
-                //System.out.println (vertex + " " + module + " " + set);
+                Set <Vertex> set = signals.get (module);
                 set.remove (vertex);
+                //System.out.println (vertex + " " + module + " " + set);
                 
                 if (set.isEmpty ()) {
                     final double w = vertex.getWeight (i, total);
                     ratio /= Math.pow (w / tauV, betaAV - 1);
-                    modules.remove (module);
                 }
             }
         }

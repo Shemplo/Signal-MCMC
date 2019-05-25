@@ -1,8 +1,8 @@
-package ru.shemplo.metagennet.io;
+package ru.shemplo.mcmc.io;
 
 import java.io.IOException;
 
-import ru.shemplo.metagennet.graph.Graph;
+import ru.shemplo.mcmc.graph.Graph;
 
 public interface GraphReader {
     

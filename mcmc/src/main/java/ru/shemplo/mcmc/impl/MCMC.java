@@ -1,10 +1,10 @@
-package ru.shemplo.metagennet.mcmc;
+package ru.shemplo.mcmc.impl;
 
 import java.util.List;
 import java.util.Set;
 
-import ru.shemplo.metagennet.graph.GraphDescriptor;
-import ru.shemplo.metagennet.graph.Vertex;
+import ru.shemplo.mcmc.graph.GraphDescriptor;
+import ru.shemplo.mcmc.graph.Vertex;
 
 public interface MCMC {
     

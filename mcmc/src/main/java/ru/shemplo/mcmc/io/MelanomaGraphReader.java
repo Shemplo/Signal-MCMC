@@ -1,4 +1,4 @@
-package ru.shemplo.metagennet.io;
+package ru.shemplo.mcmc.io;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,26 +9,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import ru.shemplo.metagennet.graph.Graph;
-import ru.shemplo.metagennet.graph.GraphSignals;
-import ru.shemplo.metagennet.graph.GraphSignals.GraphSignal;
-import ru.shemplo.metagennet.graph.Vertex;
+import ru.shemplo.mcmc.graph.Graph;
+import ru.shemplo.mcmc.graph.GraphSignals;
 import ru.shemplo.snowball.stuctures.Pair;
 import ru.shemplo.snowball.utils.StringManip;
 import ru.shemplo.snowball.utils.fp.StreamUtils;
 
-public class MelanomaAdvGraphReader extends MelanomaGraphReader {
-    
+public class MelanomaGraphReader implements GraphReader {
+
     @Override
     public Graph readGraph (String filename) throws IOException {
-        Map <String, Double> genesDesc = super.readGenes ("runtime/melanoma", 1);
-        genesDesc.keySet ().forEach (gene -> {
-            genesDesc.compute (gene, (__, ___) -> -1.0D);
-        });
-        genesDesc.putAll (readGenes ("runtime/" + filename, 1)); // will override existing
-        
+        Map <String, Double> genesDesc = readGenes ("runtime/" + filename, 1);
         List <Pair <String, String>> edgesDesc = readEdges ();
-        Graph graph = new Graph (0.386, 1.0);
+        Graph graph = new Graph (0.668, 1.0);
         
         edgesDesc = edgesDesc.stream ()
                   . filter  (pair -> genesDesc.containsKey (pair.F)
@@ -41,10 +34,8 @@ public class MelanomaAdvGraphReader extends MelanomaGraphReader {
         Map <String, Integer> gene2index = new HashMap <> ();
         for (int i = 0; i < genesVerts.size (); i++) {
             String name = genesVerts.get (i);
-            Vertex v = graph.addVertex (i, genesDesc.get (name));
-            v.setStable (v.getWeight () != -1.0D); 
-            v.setName (name);
-            
+            graph.addVertex (i, genesDesc.get (name))
+                 .setName (name);
             gene2index.put (name, i);
         }
         
@@ -59,22 +50,13 @@ public class MelanomaAdvGraphReader extends MelanomaGraphReader {
         }
         
         graph.setSignals (GraphSignals.splitGraph (graph));
-        ///*
-        GraphSignals modules = graph.getSignals ();
-        modules.getSignals ().values ().stream ().distinct ()
-        . filter  (signal -> signal.getVertices ().size () > 1)
-        . sorted  (Comparator.comparing (GraphSignal::getLikelihood))
-        . forEach (signal -> {
-            Set <Vertex> vertices = signal.getVertices ();
-            Vertex vertex = vertices.iterator ().next ();
-            System.out.print (String.format ("Signal |S = %-2d| {W = %.3e} ", vertices.size (), vertex.getWeight ()));
-            System.out.print (signal.getVertices ().stream ().limit (49).map (Vertex::getName)
-                              . collect (Collectors.joining (", ", "[", "")));
-            if (signal.getVertices ().size () < 50) {
-                System.out.println ("]");
-            } else { System.out.println (", ...]"); }
+        /*
+        GraphModules modules = graph.getModules ();
+        modules.getModules ().forEach ((vert, module) -> {
+            System.out.println ("Module");
+            module.getVertices ().forEach (System.out::println);
         });
-        //*/
+        */
         
         graph.getOrientier ().addAll (Arrays.asList (
             "CDKN2A", "MTAP", "MX2", "PARP1", "ARNT", "SETDB1",
@@ -87,7 +69,22 @@ public class MelanomaAdvGraphReader extends MelanomaGraphReader {
         return graph;
     }
     
-    @Override
+    protected List <Pair <String, String>> readEdges () throws IOException {
+        List <Pair <String, String>> edges = new ArrayList <> ();
+        Path filepath = Paths.get ("runtime/inwebIM_ppi.txt");
+        try (
+            BufferedReader br = Files.newBufferedReader (filepath);
+        ) {
+            String line = null;
+            while ((line = StringManip.fetchNonEmptyLine (br)) != null) {
+                final StringTokenizer st = new StringTokenizer (line);
+                edges.add (Pair.mp (st.nextToken (), st.nextToken ()));
+            }
+        }
+        
+        return edges;
+    }
+    
     protected Map <String, Double> readGenes (String filename, int shift) throws IOException {
         final Map <String, Double> genes = new HashMap <> ();
         Path filepath = Paths.get (filename);
@@ -96,30 +93,15 @@ public class MelanomaAdvGraphReader extends MelanomaGraphReader {
         ) {
             br.readLine (); // titles
             
-            Map <String, Set <String>> classes = new HashMap <> ();
-            Map <String, Double> pvals = new HashMap <> ();
-            
             String line = null;
             while ((line = StringManip.fetchNonEmptyLine (br)) != null) {
                 final StringTokenizer st = new StringTokenizer (line);
                 List <String> tokens = StreamUtils.whilst (StringTokenizer::hasMoreTokens, 
                                                            StringTokenizer::nextToken, st)
                                      . collect (Collectors.toList ());
-                
-                final String eqClass = tokens.get (4);
-                classes.putIfAbsent (eqClass, new LinkedHashSet <> ());
-                
-                final String [] genesArray = tokens.get (6).split (";");
-                classes.get (eqClass).addAll (Arrays.asList (genesArray));
-                
-                final double pvalue = Double.parseDouble (tokens.get (3));
-                pvals.compute (eqClass, (__, v) -> v == null ? pvalue : Math.min (v, pvalue));
+                Double pvalue = Double.parseDouble (tokens.get (1 + shift));
+                genes.put (tokens.get (shift), pvalue);
             }
-            
-            classes.forEach ((eq, genesSet) -> {
-                final double pvalue = pvals.get (eq);
-                genesSet.forEach (gene -> genes.put (gene, pvalue));
-            });
         }
         
         return genes;

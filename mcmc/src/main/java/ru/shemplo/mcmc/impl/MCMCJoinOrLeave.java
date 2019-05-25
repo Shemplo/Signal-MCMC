@@ -1,9 +1,9 @@
-package ru.shemplo.metagennet.mcmc;
+package ru.shemplo.mcmc.impl;
 
-import static ru.shemplo.metagennet.RunMetaGenMCMC.*;
+import static ru.shemplo.mcmc.RunMetaGenMCMC.*;
 
-import ru.shemplo.metagennet.graph.Edge;
-import ru.shemplo.metagennet.graph.GraphDescriptor;
+import ru.shemplo.mcmc.graph.Edge;
+import ru.shemplo.mcmc.graph.GraphDescriptor;
 
 public class MCMCJoinOrLeave extends AbsMCMC {
     

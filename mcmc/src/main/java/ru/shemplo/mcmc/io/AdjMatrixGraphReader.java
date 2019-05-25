@@ -1,4 +1,4 @@
-package ru.shemplo.metagennet.io;
+package ru.shemplo.mcmc.io;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import ru.shemplo.metagennet.graph.Graph;
+import ru.shemplo.mcmc.graph.Graph;
 import ru.shemplo.snowball.utils.StringManip;
 
 public class AdjMatrixGraphReader implements GraphReader {

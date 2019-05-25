@@ -1,4 +1,4 @@
-package ru.shemplo.metagennet.graph;
+package ru.shemplo.mcmc.graph;
 
 import static java.util.stream.Collectors.*;
 

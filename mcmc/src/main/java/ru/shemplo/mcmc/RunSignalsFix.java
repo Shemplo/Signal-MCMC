@@ -1,4 +1,4 @@
-package ru.shemplo.metagennet;
+package ru.shemplo.mcmc;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,10 +10,10 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import ru.shemplo.metagennet.graph.Graph;
-import ru.shemplo.metagennet.graph.Vertex;
-import ru.shemplo.metagennet.io.GraphReader;
-import ru.shemplo.metagennet.io.MelanomaGraphReader;
+import ru.shemplo.mcmc.graph.Graph;
+import ru.shemplo.mcmc.graph.Vertex;
+import ru.shemplo.mcmc.io.GraphReader;
+import ru.shemplo.mcmc.io.MelanomaGraphReader;
 import ru.shemplo.snowball.stuctures.Pair;
 import ru.shemplo.snowball.utils.StringManip;
 

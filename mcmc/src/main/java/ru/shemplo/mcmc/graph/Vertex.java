@@ -1,4 +1,4 @@
-package ru.shemplo.metagennet.graph;
+package ru.shemplo.mcmc.graph;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

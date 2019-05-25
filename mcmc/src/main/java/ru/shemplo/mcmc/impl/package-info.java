@@ -5,4 +5,4 @@
  * @author Shemplo
  *
  */
-package ru.shemplo.metagennet;
+package ru.shemplo.mcmc.impl;

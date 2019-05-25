@@ -1,4 +1,4 @@
-package ru.shemplo.metagennet.io;
+package ru.shemplo.mcmc.io;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -6,7 +6,7 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import ru.shemplo.metagennet.graph.*;
+import ru.shemplo.mcmc.graph.*;
 import ru.shemplo.snowball.stuctures.Pair;
 
 public class CommonWriter {

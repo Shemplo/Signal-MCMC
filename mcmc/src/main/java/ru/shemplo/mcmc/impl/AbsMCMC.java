@@ -1,4 +1,4 @@
-package ru.shemplo.metagennet.mcmc;
+package ru.shemplo.mcmc.impl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,9 +7,9 @@ import java.util.Set;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ru.shemplo.metagennet.graph.Edge;
-import ru.shemplo.metagennet.graph.GraphDescriptor;
-import ru.shemplo.metagennet.graph.Vertex;
+import ru.shemplo.mcmc.graph.Edge;
+import ru.shemplo.mcmc.graph.GraphDescriptor;
+import ru.shemplo.mcmc.graph.Vertex;
 
 @RequiredArgsConstructor
 public abstract class AbsMCMC implements MCMC {

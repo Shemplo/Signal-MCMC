@@ -1,4 +1,4 @@
-package ru.shemplo.metagennet.graph;
+package ru.shemplo.mcmc.graph;
 
 import java.util.*;
 import java.util.function.Function;
@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import ru.shemplo.metagennet.mcmc.MCMC;
-import ru.shemplo.metagennet.mcmc.MCMCJoinOrLeave;
+import ru.shemplo.mcmc.impl.MCMC;
+import ru.shemplo.mcmc.impl.MCMCJoinOrLeave;
 import ru.shemplo.snowball.stuctures.Pair;
 
 @RequiredArgsConstructor

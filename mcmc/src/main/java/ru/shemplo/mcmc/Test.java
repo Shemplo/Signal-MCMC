@@ -1,10 +1,10 @@
-package ru.shemplo.metagennet;
+package ru.shemplo.mcmc;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import ru.shemplo.metagennet.graph.Edge;
-import ru.shemplo.metagennet.graph.Vertex;
+import ru.shemplo.mcmc.graph.Edge;
+import ru.shemplo.mcmc.graph.Vertex;
 
 public class Test {
     
