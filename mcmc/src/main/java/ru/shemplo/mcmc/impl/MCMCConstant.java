@@ -1,6 +1,6 @@
 package ru.shemplo.mcmc.impl;
 
-import static ru.shemplo.mcmc.RunMetaGenMCMC.*;
+import static ru.shemplo.mcmc.RunMCMC.*;
 
 import ru.shemplo.mcmc.graph.Edge;
 import ru.shemplo.mcmc.graph.GraphDescriptor;

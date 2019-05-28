@@ -26,13 +26,17 @@ public class CSVGraphReader implements GraphReader {
         Pair <List <String>, List <List <String>>> verticesCSV = readCSV ("runtime/" + filenamePrefix + "vertices.csv");
         Pair <List <String>, List <List <String>>> edgesCSV = readCSV ("runtime/" + filenamePrefix + "edges.csv");
         
+        Graph graph = new Graph (0.133, 0.195); // gatom_
+        //Graph graph = new Graph (0.18, 1.0); // paper_
+        //Graph graph = new Graph (0.363, 0.431); // generated_
+        
         int nameColumnV = verticesCSV.F.indexOf ("\"geneSymbol\"") != -1
                         ? verticesCSV.F.indexOf ("\"geneSymbol\"")
                         : verticesCSV.F.indexOf ("\"name\"");
         int pvalColumnV = verticesCSV.F.indexOf ("\"pval\"");
         AtomicInteger counter = new AtomicInteger ();
-        final Map <String, Vertex> vertices 
-            = verticesCSV.S.stream ().map (lst -> Pair.mp (lst.get (nameColumnV), lst))
+        final Map <String, Vertex> vertices = verticesCSV.S.stream ()
+            . map     (lst -> Pair.mp (lst.get (nameColumnV), lst))
             . map     (p -> p.applyS (lst -> {
                 final int index = counter.getAndIncrement ();
                 Double weight = null;
@@ -41,6 +45,8 @@ public class CSVGraphReader implements GraphReader {
                 
                 Vertex vertex = new Vertex (index, weight);
                 vertex.setName (p.F.replace ("\"", ""));
+                graph.addVertex (vertex);
+                
                 return vertex;
             }))
             . collect (Collectors.toMap (Pair::getF, Pair::getS));
@@ -50,8 +56,6 @@ public class CSVGraphReader implements GraphReader {
         int pvalColumnE = edgesCSV.F.indexOf ("\"weight\"") != -1 
                         ? edgesCSV.F.indexOf ("\"weight\"")
                         : edgesCSV.F.indexOf ("\"pval\"");
-        //Graph graph = new Graph (0.133, 0.195);
-        Graph graph = new Graph (0.18, 1.0);
         edgesCSV.S.forEach (edge -> {
             String from = edge.get (fromColumnE).replaceAll ("\\(\\d+\\)", ""), 
                    to   = edge.get (toColumnR).replaceAll ("\\(\\d+\\)", "");
@@ -64,7 +68,8 @@ public class CSVGraphReader implements GraphReader {
             graph.addEdge (edgeI);
         });
         
-        graph.setSignals (GraphSignals.assignUnique (graph));
+        //graph.setSignals (GraphSignals.assignUnique (graph));
+        graph.setSignals (GraphSignals.splitGraph (graph));
         
         if (filenamePrefix.equals ("paper_")) {
             graph.getOrientier ().addAll (Arrays.asList (

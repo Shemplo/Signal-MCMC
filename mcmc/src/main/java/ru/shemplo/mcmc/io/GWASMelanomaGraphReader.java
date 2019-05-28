@@ -2,17 +2,21 @@ package ru.shemplo.mcmc.io;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import ru.shemplo.mcmc.graph.Graph;
 import ru.shemplo.mcmc.graph.GraphSignals;
+import ru.shemplo.mcmc.graph.GraphSignals.GraphSignal;
+import ru.shemplo.mcmc.graph.Vertex;
 import ru.shemplo.snowball.stuctures.Pair;
 
-public class GWASGraphReader extends MelanomaGraphReader {
-    
+public class GWASMelanomaGraphReader extends MelanomaGraphReader {
+
     @Override
-    public Graph readGraph (String filenamePrefix) throws IOException {
+    public Graph readGraph (String filename) throws IOException {
+        Map <String, Double> genesDescAdd = readGenes ("runtime/melanoma", 1);
         Map <String, Double> genesDesc = readGenes ("runtime/gwas.csv", 0);
         List <Pair <String, String>> edgesDesc = readEdges ();
         Graph graph = new Graph (0.571, 1.0);
@@ -44,6 +48,32 @@ public class GWASGraphReader extends MelanomaGraphReader {
         }
         
         graph.setSignals (GraphSignals.splitGraph (graph));
+        
+        Map <Integer, GraphSignal> signals = new HashMap <> (
+            graph.getSignals ().getSignals ()
+        );
+        
+        AtomicInteger iterator = new AtomicInteger (signals.size ());
+        signals.forEach ((id, signal) -> {
+            Vertex vertex = signal.getVertices ().iterator ().next ();
+            if (!genesDescAdd.containsKey (vertex.getName ())) { 
+                return; // no data for such gene
+            }
+            
+            double weight = genesDescAdd.get (vertex.getName ());
+            if (Math.abs (signal.getLikelihood () - weight) < 1E-32) {
+                graph.getSignals ().getSignals ().remove (id);
+                
+                signal.getVertices ().forEach (v -> {
+                    Set <Vertex> set = new HashSet <> ();
+                    set.add (v);
+                    
+                    final int nid = iterator.getAndIncrement ();
+                    GraphSignal sig = new GraphSignal (nid, set, weight);
+                    graph.getSignals ().addSignal (sig);
+                });
+            }
+        });
         
         graph.getOrientier ().addAll (Arrays.asList (
             "CDKN2A", "MTAP", "MX2", "PARP1", "ARNT", "SETDB1",

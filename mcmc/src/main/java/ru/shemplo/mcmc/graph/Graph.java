@@ -173,7 +173,7 @@ public class Graph {
         return edges.stream ()
              . map       (Edge::getWeight)
              . sorted    ().distinct ().skip (n)
-             . findFirst ().get ();
+             . findFirst ().orElse (1.0);
     }
     
     public double getNthVertexWeight (int n) {
@@ -185,7 +185,7 @@ public class Graph {
         return vertices.stream ()
              . map       (Vertex::getWeight)
              . sorted    ().distinct ().skip (n)
-             . findFirst ().get ();
+             . findFirst ().orElse (1.0);
     }
     
 }
