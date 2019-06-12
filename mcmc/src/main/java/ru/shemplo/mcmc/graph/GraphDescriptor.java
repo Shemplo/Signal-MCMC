@@ -31,6 +31,8 @@ public class GraphDescriptor implements Cloneable {
     @Getter @Setter private double tauE = 1, tauV = 1;
     @Getter private double ratio = 1;
     
+    @Getter private final List <Set <Edge>> snapshots = new ArrayList <> ();
+    
     public GraphDescriptor setTausFromGraph (int vn, int en) {
         if (vn < 1 || en < 1) {
             String message = "Tau selection parameters must be positive";
@@ -129,6 +131,7 @@ public class GraphDescriptor implements Cloneable {
             history.pollLast ();
         }
         
+        snapshots.add (new HashSet <> (edges));
         this.ratio = 1.0d;
         return this;
     }
@@ -149,6 +152,7 @@ public class GraphDescriptor implements Cloneable {
             ratio = event.T;
         }
         
+        snapshots.add (new HashSet <> (edges));
         if (!signal) { ratio = 1; }
         return this;
     }

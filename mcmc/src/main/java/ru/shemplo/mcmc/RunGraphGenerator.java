@@ -17,10 +17,10 @@ public class RunGraphGenerator {
     
     public static final double BETA_A_V = 0.363, BETA_B_V = 1;
     public static final double BETA_A_E = 0.431, BETA_B_E = 1;
-    public static final int VERTS = 2000, VERTS_DEV = 5; // deviation
+    public static final int VERTS = 100, VERTS_DEV = 5; // deviation
     public static final int EDGES = (VERTS - 1) * 2 + 100,
                             EDGES_DEV = 2;
-    public static final int MODULE_SIZE = 100;
+    public static final int MODULE_SIZE = 20;
     
     private static final Random R = new Random ();
     

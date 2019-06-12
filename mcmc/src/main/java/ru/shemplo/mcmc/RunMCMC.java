@@ -15,8 +15,8 @@ import ru.shemplo.mcmc.graph.GraphSignals;
 import ru.shemplo.mcmc.graph.Vertex;
 import ru.shemplo.mcmc.impl.MCMC;
 import ru.shemplo.mcmc.impl.MCMCJoinOrLeave;
+import ru.shemplo.mcmc.io.CSVGraphReader;
 import ru.shemplo.mcmc.io.CommonWriter;
-import ru.shemplo.mcmc.io.GWASMelanomaGraphReader;
 import ru.shemplo.mcmc.io.GraphReader;
 import ru.shemplo.snowball.stuctures.Pair;
 
@@ -24,12 +24,13 @@ public class RunMCMC {
     
     //public static final int TAU_V_N = 7, TAU_E_N = 1; // GWAS graph reader
     // public static final int TAU_V_N = 17, TAU_E_N = 20; // Gatom
-    public static final int TAU_V_N = 10, TAU_E_N = 1; // melanoma adv
+    //public static final int TAU_V_N = 8, TAU_E_N = 1; // melanoma adv
+    public static final int TAU_V_N = 9, TAU_E_N = 9;
     
     public static final Random RANDOM = new Random ();
     
     private static final boolean SIGNALS = true, LONG_RUN = !true;
-    private static final int TRIES = 300, ITERATIONS = 500000;
+    private static final int TRIES = 150, ITERATIONS = 300000;
     private static final boolean REGENERATE = !true;
     private static final boolean TRACE = !true;
     private static final int MODULE_SIZE = 1;
@@ -37,7 +38,7 @@ public class RunMCMC {
     private static final BiFunction <GraphDescriptor, Integer, MCMC> SUPPLIER = 
         (graph, iterations) -> new MCMCJoinOrLeave (graph, iterations);
     
-    private static final ExecutorService pool = Executors.newFixedThreadPool (REGENERATE ? 1 : 3);
+    private static final ExecutorService pool = Executors.newFixedThreadPool (REGENERATE ? 1 : 5);
     private static final Map <Vertex, Double> occurrences = new HashMap <> ();
     private static final List <Double> likelihoods = new ArrayList <> ();
     private static final CommonWriter writer = new CommonWriter ();
@@ -48,14 +49,14 @@ public class RunMCMC {
         //final GraphReader reader      = new MelanomaAdvGraphReader ();
         //Graph initial = reader.readGraph ("mapped_melanoma_gwas.txt");
         
-        //final GraphReader reader = new CSVGraphReader ();
+        final GraphReader reader = new CSVGraphReader ();
         //Graph initial = reader.readGraph ("gatom_");
-        //Graph initial = reader.readGraph ("generated_");
+        Graph initial = reader.readGraph ("generated_");
         //Graph initial = reader.readGraph ("paper_");
         
         //GraphReader reader = new GWASGraphReader ();
-        GraphReader reader = new GWASMelanomaGraphReader ();
-        Graph initial = reader.readGraph ("");
+        //GraphReader reader = new GWASMelanomaGraphReader ();
+        //Graph initial = reader.readGraph ("");
         System.out.println ("Vertecies: " + initial.getVertices ().size ());
         System.out.println ("Signals: " + initial.getSignals ()
                             . getSignals ().values ().stream ()
