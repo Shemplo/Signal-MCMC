@@ -79,7 +79,13 @@ public class CSVGraphReader implements GraphReader {
                 "TGFBR2", "WEE1", "VCL", "BLNK", "BMF", "SH3BP5", 
                 "KCNA3"
             ));
-        }
+        } /* else if (filenamePrefix.equals ("generated_")) {
+            graph.getOrientier ().addAll (Arrays.asList (
+                "V8", "V9", "V17", "V18", "V21", "V24", "V27", "V37", 
+                "V38", "V39", "V47", "V48", "V56", "V61", "V64", "V74",
+                "V86", "V89", "V90", "V92"
+            ));
+        } */
         
         return graph;
     }

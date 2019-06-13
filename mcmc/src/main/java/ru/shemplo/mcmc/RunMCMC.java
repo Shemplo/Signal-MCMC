@@ -25,7 +25,7 @@ public class RunMCMC {
     //public static final int TAU_V_N = 7, TAU_E_N = 1; // GWAS graph reader
     // public static final int TAU_V_N = 17, TAU_E_N = 20; // Gatom
     //public static final int TAU_V_N = 8, TAU_E_N = 1; // melanoma adv
-    public static final int TAU_V_N = 9, TAU_E_N = 9;
+    public static final int TAU_V_N = 3, TAU_E_N = 5;
     
     public static final Random RANDOM = new Random ();
     
@@ -38,7 +38,7 @@ public class RunMCMC {
     private static final BiFunction <GraphDescriptor, Integer, MCMC> SUPPLIER = 
         (graph, iterations) -> new MCMCJoinOrLeave (graph, iterations);
     
-    private static final ExecutorService pool = Executors.newFixedThreadPool (REGENERATE ? 1 : 5);
+    private static final ExecutorService pool = Executors.newFixedThreadPool (REGENERATE ? 1 : 3);
     private static final Map <Vertex, Double> occurrences = new HashMap <> ();
     private static final List <Double> likelihoods = new ArrayList <> ();
     private static final CommonWriter writer = new CommonWriter ();

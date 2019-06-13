@@ -45,9 +45,11 @@ public class MCMCJoinOrLeave extends AbsMCMC {
             qS2Ss = 1.0 / Math.max (currentGraph.getEdges ().size (), 1);
             //System.out.println ("IE " + currentGraph.getEdges ());
             //System.out.println ("R in " + currentGraph.getInnerEdges ());
+            /*
             if (!currentGraph.removeEdge (candidate).isConnected ()) {
                 currentGraph.rollback (); return;
             }
+            */
             //System.out.println ("connected");
             
             //qSs2S = 1.0 / Math.max (currentGraph.getBorderEdges (), 1);

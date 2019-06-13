@@ -131,7 +131,7 @@ public class GraphDescriptor implements Cloneable {
             history.pollLast ();
         }
         
-        snapshots.add (new HashSet <> (edges));
+        //snapshots.add (new HashSet <> (edges));
         this.ratio = 1.0d;
         return this;
     }
@@ -152,7 +152,7 @@ public class GraphDescriptor implements Cloneable {
             ratio = event.T;
         }
         
-        snapshots.add (new HashSet <> (edges));
+        //snapshots.add (new HashSet <> (edges));
         if (!signal) { ratio = 1; }
         return this;
     }
